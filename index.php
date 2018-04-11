@@ -43,12 +43,22 @@
 
     foreach($td as $key => $value) {
         if($key % 3 === 0) {
-            echo 'linia: ' . $td[$key] . ' | ';
-            echo 'kierunek: ' . $td[$key + 1] . ' | ';
-            echo 'odjazd: ' . $td[$key + 2] . ' | ' . '<br>';
+            $przystanek_1[$key] = ['linia' => $td[$key], 'kierunek' => $td[$key + 1], 'odjazd' => $td[$key + 2]];
         }
+    }   
 
-        // echo $key . ' => ' . $value . '<br>';
+    $crawler = $client->request('GET', 'http://koszalin.kiedyprzyjedzie.pl/departures?busStopDesignator=53');
+    $th = $crawler->filter('th')->each(function (Crawler $node, $i) {
+        return $node->text();
+    });
+    $td = $crawler->filter('td')->each(function (Crawler $node, $i) {
+        return $node->text();
+    });
+
+    foreach($td as $key => $value) {
+        if($key % 3 === 0) {
+            $przystanek_2[$key] = ['linia' => $td[$key], 'kierunek' => $td[$key + 1], 'odjazd' => $td[$key + 2]];
+        }
     }   
 ?>
 
@@ -106,7 +116,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+                                <?php foreach($przystanek_1 as $key => $przystanek) {?>
+                                    <tr>
+                                        <td><?= $przystanek['linia'] ?></td>
+                                        <td><?= $przystanek['kierunek'] ?></td>
+                                        <td><?= $przystanek['odjazd'] ?></td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
 
@@ -119,6 +135,25 @@
                     <div class="col-md-12 text-center">
 
                        <h3>Clausiusa / 02</h3>
+
+                       <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th><?= $th[0] ?></th>
+                                    <th><?= $th[1] ?></th>
+                                    <th><?= $th[2] ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach($przystanek_2 as $key => $przystanek) {?>
+                                    <tr>
+                                        <td><?= $przystanek['linia'] ?></td>
+                                        <td><?= $przystanek['kierunek'] ?></td>
+                                        <td><?= $przystanek['odjazd'] ?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
 
                     </div>
                 </div>
