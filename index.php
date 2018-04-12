@@ -3,8 +3,8 @@
     /**
      * Stworzone przez Szymon Tomczyk
      * E-mail: <szymon.tomczyk26@gmail.com>
-     * Version: 1.0.0
-     * Version date: 05-03-2018
+     * Version: 1.2.0
+     * Version date: 12-04-2018
      */
 
     require 'vendor/autoload.php';
@@ -33,33 +33,7 @@
     $sn = $crawler->text();
     $pieces = explode("|", $sn);
 
-    $crawler = $client->request('GET', 'http://koszalin.kiedyprzyjedzie.pl/departures?busStopDesignator=40');
-    $th = $crawler->filter('th')->each(function (Crawler $node, $i) {
-        return $node->text();
-    });
-    $td = $crawler->filter('td')->each(function (Crawler $node, $i) {
-        return $node->text();
-    });
-
-    foreach($td as $key => $value) {
-        if($key % 3 === 0) {
-            $przystanek_1[$key] = ['linia' => $td[$key], 'kierunek' => $td[$key + 1], 'odjazd' => $td[$key + 2]];
-        }
-    }   
-
-    $crawler = $client->request('GET', 'http://koszalin.kiedyprzyjedzie.pl/departures?busStopDesignator=53');
-    $th = $crawler->filter('th')->each(function (Crawler $node, $i) {
-        return $node->text();
-    });
-    $td = $crawler->filter('td')->each(function (Crawler $node, $i) {
-        return $node->text();
-    });
-
-    foreach($td as $key => $value) {
-        if($key % 3 === 0) {
-            $przystanek_2[$key] = ['linia' => $td[$key], 'kierunek' => $td[$key + 1], 'odjazd' => $td[$key + 2]];
-        }
-    }   
+     
 ?>
 
 <!DOCTYPE html>
@@ -110,9 +84,9 @@
                         <table style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th><?= $th[0] ?></th>
-                                    <th><?= $th[1] ?></th>
-                                    <th><?= $th[2] ?></th>
+                                    <th>linia</th>
+                                    <th>kierunek</th>
+                                    <th>odjazd</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -139,9 +113,9 @@
                        <table style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th><?= $th[0] ?></th>
-                                    <th><?= $th[1] ?></th>
-                                    <th><?= $th[2] ?></th>
+                                    <th>linia</th>
+                                    <th>kierunek</th>
+                                    <th>odjazd</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -237,9 +211,9 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             
-            function getActualTime () {
+            function getActualTime() {
 
                 var date = new Date;
                 var seconds = date.getSeconds();
@@ -255,9 +229,50 @@
                 $('#aktualna_godzina').html(aktualna_godzina);
             }
 
-            setInterval(function () {
+            setInterval(function() {
                 getActualTime();
             }, 1000);
+
+            // AJAX POBIERANIE PRZYSTANKOW CO MINUTKE
+
+            $.ajax({
+                url: 'busstop_1.php'
+            })
+            .done(function(data) {
+                // data.forEach(function(value, index) {
+                //     console.log(value['linia']);
+                // });
+                var przystanek_1 = JSON.parse(data);
+
+                console.log(przystanek_1[0].linia);
+            });
+
+            $.ajax({
+                url: 'busstop_2.php'
+            })
+            .done(function(data) {
+                var przystanek_2 = data;
+            });
+
+            // PRZYSTANEK CLAUSIUSA 01
+            setInterval(function() {
+                $.ajax({
+                    url: 'busstop_1.php'
+                })
+                .done(function(data) {
+                    var przystanek_1 = data;
+                });
+            }, 60000);
+
+            // PRZYSTANEK CLAUSIUSA 02
+            setInterval(function() {
+                $.ajax({
+                    url: 'busstop_2.php'
+                })
+                .done(function(data) {
+                    var przystanek_2 = data;
+                });
+            }, 60000);
         });
     </script>
 
